@@ -1,70 +1,28 @@
-# TRAE SOLO Skills Workspace — AGENTS.md
+# SOO Skill Factory — AGENTS.md
 
-SOLO 技能创作赛（forum.trae.cn/c/37-category/37）的 Skill 开发工作区。基于 skill-creator 方法论，使用 Spec-Driven 开发流程创建、测试、迭代和发布 TRAE SOLO Skill 包。
+SOLO 技能创作赛的 Skill 开发工作区。3个已发布的 TRAE SOLO Skill（device-security / forum-pro / workflow-automator），基于 skill-creator Spec-Driven 方法论开发。
 
-## 🚀 Quick Start (New AI Session)
+**GitHub**: https://github.com/bigmanBass666/soo-skill-factory | **状态**: 见 [`.context/activeContext.md`](./.context/activeContext.md)
 
-You are looking at the **SOO Skill Factory** project — a collection of 3 SOLO Skills created for the TRAE forum skill creation contest.
+## Quick Start (New AI Session)
 
-If this is your **first time** seeing this project:
+1. `bash scripts/setup-deps.sh` — 一键恢复所有依赖（chromium + npm + 系统依赖）
+2. Read `.context/activeContext.md` — 当前状态和上下文（30秒）
+3. Read `.context/progress.md` — 完整时间线和下一步（2分钟）
 
-1. **Read `.context/activeContext.md`** — Current focus and status (30 seconds)
-2. **Read `.context/progress.md`** — Full timeline and next steps (2 minutes)
-3. **Decide what to do next** based on progress.md suggestions
+### Cookie（发帖必需）
 
-### What's in this project?
-
-| Item | Location | Purpose |
-|------|---------|---------|
-| 3 Skills | `skills/` | Complete source code (SKILL.md + refs + scripts + evals) |
-| Packaged .skill files | `releases/` | Ready-to-download install packages |
-| Contest posts | `posts/` | Competition submission drafts |
-| Tool scripts | `scripts/` | Playwright publishers, forum browsers, message checkers |
-| Persistent memory | `.context/` | activeContext.md + progress.md + decisions.md |
-| Design specs | `.trae/specs/` | Spec documents for each skill |
-| This file | `AGENTS.md` | Project instructions for AI agents |
-
-### Project Status (as of 2026-05-13)
-
-- ✅ Skill 1: trae-device-security (#17079, post 79889) — Published + links fixed (v6)
-- ✅ Skill 2: trae-forum-pro (#17166, post 80287) — Published + links fixed (v6)
-- ✅ Skill 3: trae-workflow-automator (#17234, post 80594) — Published + links added (v2)
-- 🎯 All 3 posts verified: download links return HTTP 200
-- 📋 Next: Community engagement / Iteration 2 optimization / 社媒传播
-
-### Critical: Cookie Configuration
-
-**Forum publishing requires login cookies.** They are NOT in this repo (security).
-
-To use forum features:
-1. Check if `cookie.md` exists in your working directory
-2. If not, ask the user to provide their TRAE forum session cookie
-3. The cookie must include `_forum_session` and `sessionid` fields
-4. Cookie 格式: 每行一个 `name=value` 对，必须包含 `_forum_session` 和 `sessionid`
-5. 将 cookie 文件保存为 `/workspace/cookie.md`（脚本会自动读取）
-
-### GitHub Repository
-
-- **URL**: https://github.com/bigmanBass666/soo-skill-factory
-- **Purpose**: Portable workspace — clone it anywhere to get the full project
+论坛发布需要登录凭证，**不在仓库中**。检查 `/workspace/cookie.md` 是否存在，不存在则请用户提供 TRAE forum session cookie（需包含 `_forum_session` 和 `sessionid` 字段，每行一个 `name=value` 对）。
 
 ## Dev Environment Tips
 
 ```bash
-# 一键恢复依赖（推荐！包含系统依赖 + npm + playwright chromium）
-bash scripts/setup-deps.sh
+bash scripts/setup-deps.sh          # 一键恢复全部依赖（推荐）
+bash scripts/setup-deps.sh --skip-apt  # 跳过系统依赖（仅npm+chromium）
+```
 
-# 或者手动安装：
-# 1. 系统依赖
-apt-get install -y libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 \
-  libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2
-
-# 2. npm + Playwright
-npm config set registry https://registry.npmmirror.com
-npm install
-npx playwright install chromium
-
-# 3. Chromium 路径（脚本中必须指定）
+Node.js 脚本中 Playwright 启动必须指定:
+```javascript
 executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'
 ```
 
@@ -72,11 +30,11 @@ executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-
 
 | 命令 | 用途 |
 |------|------|
-| `node publish-forum.js` | 发布 device-security 参赛帖 |
-| `node publish-forum-pro.js` | 发布 forum-pro 参赛帖 |
-| `node find-post.js` | 查找已发布帖子 ID |
-| `node verify-post.js` | 验证帖子内容完整性 |
-| `node debug-login.js` | 排查 Cookie 登录状态 |
+| `node scripts/publish-forum.js` | 发布 device-security 参赛帖 |
+| `node scripts/publish-forum-pro.js` | 发布 forum-pro 参赛帖 |
+| `node scripts/publish-workflow-automator.js` | 发布 workflow-automator 参赛帖 |
+| `node scripts/find-post.js` | 查找已发布帖子 ID |
+| `node scripts/check-messages-api.js` | 检查论坛消息 API 状态 |
 
 **无标准 build/test/lint 流程** — 本项目是脚本驱动的工作区，核心产出是 `.skill` 文件和论坛帖子。
 
@@ -84,27 +42,20 @@ executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-
 
 ```
 workspace/
-├── skills/                        # 3个 SOLO Skill (完整源码)
-│   ├── trae-device-security/      # Skill 1: 账号安全管家 (#17079)
-│   │   ├── SKILL.md               # 核心定义
-│   │   ├── references/            # 参考数据
-│   │   ├── scripts/               # 设备日志管理脚本
-│   │   └── evals/                 # 测试用例
-│   ├── trae-forum-pro/            # Skill 2: 论坛社区助手 (#17166)
-│   │   ├── SKILL.md / references/ / scripts/ / evals/
-│   └── trae-workflow-automator/   # Skill 3: 工作流自动化 (#17234)
-│       ├── SKILL.md / references/ / scripts/ / evals/
-├── releases/                      # 打包好的 .skill 文件 (可下载安装)
+├── skills/                        # 3个 SOLO Skill 源码
+│   ├── trae-device-security/      # #17079 账号安全管家
+│   ├── trae-forum-pro/            # #17166 论坛社区助手
+│   └── trae-workflow-automator/   # #17234 工作流自动化
+├── releases/                      # 打包好的 .skill 安装包
 ├── posts/                         # 参赛帖 Markdown 源文件
 ├── scripts/                       # 工具脚本 (setup-deps.sh / publish-*.js)
 ├── cache/                         # Playwright chromium 缓存 tar.gz (98MB, clone自带)
 ├── .context/                      # 持久化上下文 (activeContext + progress + decisions)
 ├── .trae/specs/                   # Spec 文档 (spec-driven 开发记录)
-├── cookie.md                      # TRAE 论坛登录 Cookie（不入库）
-├── AGENTS.md                      # 本文件 — AI Agent 指令
-├── README.md                      # 项目说明
-└── INSTALL.md                     # 安装指南
+└── cookie.md                      # 论坛登录 Cookie（不入库, .gitignore排除）
 ```
+
+每个 Skill 目录结构: `SKILL.md` + `references/(≥2文件)` + `scripts/` + `evals/evals.json`
 
 ## Code Style & Conventions
 
@@ -113,31 +64,22 @@ workspace/
 - **总行数 < 500 行**，理想 400-450 行（Progressive Disclosure）
 - **Frontmatter 必填**: name / description / compatibility
 - **description 必须 "pushy"** — 覆盖 10+ 触发关键词，让 Claude 主动激活
-- **正文结构**: 概述 → 触发场景(>=10) → 核心模块工作流 → 输出格式 → 最佳实践
+- **正文结构**: 概述 → 触发场景(≥10) → 核心模块工作流 → 输出格式 → 最佳实践
 - 使用祈使语气，解释"为什么"而非只说"做什么"
 - 避免 MUST/ALWAYS 全大写，改用自然强调方式
 
-### Eval 测试规范
+### Eval & Benchmark
 
 - `evals/evals.json`: 每个 eval 含 id/eval_name/prompt/expected_output/assertions
 - assertion 类型: contains / contains_any / not_contains_any / contains_regex / contains_count / contains_all
-- grading.json 字段必须: text / passed / evidence（严格匹配 viewer 格式）
-- timing.json 记录: total_tokens / duration_ms / total_duration_seconds
-
-### Benchmark 流程
-
-1. 并行启动 with-skill + without_skill subagent（同一轮次）
-2. 运行期间草拟 assertions
-3. 完成后立即 capture timing 数据
-4. 启动 grader subagent 生成 grading.json
-5. 聚合为 benchmark.json + benchmark.md
-6. 分析 weak point → 迭代优化 SKILL.md → 重新跑一轮
+- grading.json 必须含: text / passed / evidence（严格匹配 viewer 格式）
+- **Benchmark 流程**: 并行 with-skill vs baseline subagent → grader → benchmark.json → 迭代优化。详见 skill-creator 方法论
 
 ### 脚本规范
 
-- Bash 脚本: shebang `#!/usr/bin/env bash` + `set -euo pipefail`
-- Node.js 脚本: commonjs (`require`)，chromium launch 加 `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`（先跑 `setup-deps.sh` 安装）
-- 中文注释
+- Bash: shebang `#!/usr/bin/env bash` + `set -euo pipefail`
+- Node.js: commonjs (`require`)，中文注释
+- npm 安装前先 `npm config set registry https://registry.npmmirror.com`
 
 ## Boundaries
 
@@ -147,59 +89,44 @@ workspace/
 
 ## Common Pitfalls
 
-- **Cookie 过期**: `cookie.md` 中的 session 会过期（约 30 天），发帖失败时先运行 `debug-login.js` 检查登录状态。关键标志：页面显示"登录"按钮 = 过期了
-- **Playwright 浏览器缺失**: 新沙盒环境没有 chromium。**先跑 `bash scripts/setup-deps.sh`**。脚本中必须指定 `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`
-- **Discourse PUT API 会替换整个帖子内容**: `PUT /posts/{id}.json` 的 `raw` 字段是**整体替换**不是追加！更新帖子时必须传入完整内容（从本地 .md 文件读取），否则会丢失原有内容
-- **GitHub 下载链接格式**: 必须用 `raw.githubusercontent.com/{user}/{repo}/main/releases/{file}` 格式，不要用 `releases/download` 格式（需要创建 GitHub Release 才能工作）
-- **Node.js 直接 https 到论坛会 ETIMEDOUT**: 必须用 Playwright 页面内的 `page.evaluate(() => fetch(...))`
-- **正则假阴性**: Markdown 表格的 `|` 分隔符会导致跨单元格正则匹配失败。元数据推荐用内联格式 `📊 N 回复 / N 浏览` 而非纯表格
-- **Discourse ProseMirror 编辑器**: 论坛编辑器不是普通 textarea，填充正文需要用 clipboard 粘贴方案（execCommand('copy') + Ctrl+V），ProseMirror API 直接调用可能因 view.state 未就绪而失败
-- **目录命名一致性**: 创建 Skill 时注意目录名与 Skill name 完全一致（如 `trae-device-security` 不能写成 `tae-device-security`），否则打包会遗漏文件
-- **npm 镜像**: 本环境默认 registry 是官方源，安装依赖前先 `npm config set registry https://registry.npmmirror.com`
-- **page.evaluate 多参数**: 必须包成对象传递 `({a, b}) => {...}, {a, b}`，不能直接传多个参数
-- **帖子 ID 不能凭记忆**: 用 API 搜索确认，#17258 是别人的帖子，我们的 workflow-automator 是 #17234
+- **Cookie 过期**: session 约30天过期，发帖失败先检查 cookie.md 是否有效。页面显示"登录"按钮 = 过期了
+- **Playwright 浏览器缺失**: 新沙盒无 chromium。**先跑 `bash scripts/setup-deps.sh`**
+- **Discourse PUT API 会替换整个帖子内容**: `PUT /posts/{id}.json` 的 `raw` 是**整体替换**不是追加！必须从本地 .md 读完整内容推送
+- **GitHub 下载链接格式**: 必须用 `raw.githubusercontent.com/{user}/{repo}/main/releases/{file}`，不要用 `releases/download`（404）
+- **Node.js 直接 https 到论坛会 ETIMEDOUT**: 必须用 `page.evaluate(() => fetch(...))`
+- **正则假阴性**: Markdown 表格的 `|` 导致跨单元格匹配失败，元数据用内联格式 `📊 N 回复/N 浏览`
+- **Discourse ProseMirror 编辑器**: 不是普通 textarea，用 clipboard 粘贴方案（execCommand('copy') + Ctrl+V）
+- **目录命名一致性**: Skill 目录名必须与 name 完全一致（`trae-device-security` ≠ `tae-device-security`），否则打包遗漏文件
+- **npm 镜像**: 默认 registry 是官方源，安装前先 `npm config set registry https://registry.npmmirror.com`
+- **page.evaluate 多参数**: 必须包成对象 `({a, b}) => {...}, {a, b}`，不能直接传多个参数
+- **帖子 ID 不能凭记忆**: #17258 是别人的帖子，我们的 workflow-automator 是 **#17234**
 
 ## Verification Loop
 
 Skill 开发完成后的自检清单：
 
-1. **SKILL.md 行数检查**: `wc -l SKILL.md` < 500
-2. **目录完整性**: SKILL.md + references/(≥2文件) + scripts/ + evals/evals.json 都存在
-3. **Eval 可运行**: 3 组 with-skill + 3 组 baseline 共 6 个 subagent 全部完成
-4. **Grading 完成**: 6 个 grading.json 全部存在且 format 正确
-5. **Benchmark 聚合**: benchmark.json 存在，含 summary/per_eval/analysis
-6. **打包验证**: `.skill` 文件 tar.gz 格式，解压后文件完整
-7. **Checklist 全通过**: `.trae/specs/{name}-skill/checklist.md` 所有项勾选
+1. `wc -l SKILL.md` < 500
+2. 目录完整: SKILL.md + references/(≥2) + scripts/ + evals/evals.json
+3. 6组 eval 全部完成 (3 with-skill + 3 baseline)
+4. 6个 grading.json 存在且 format 正确
+5. benchmark.json 含 summary/per_eval/analysis
+6. `.skill` 文件 tar.gz 格式，解压后完整
+7. `.trae/specs/{name}-skill/checklist.md` 全通过
 
 ## Forum Publishing Workflow
 
-```bash
-# 1. 更新 cookie.md（从浏览器复制最新 Cookie）
-# 2. 修改 publish-*.js 中的 postContent 路径和 title
-# 3. 执行发布脚本
-node publish-forum-pro.js
-
-# 4. 验证发布结果
-node find-forum-pro.js    # 从用户活动页查找
-node verify-post.js       # 直接访问确认内容
-
-# 5. 帖子 URL 格式: https://forum.trae.cn/t/topic/{ID}
-#    参赛板块: https://forum.trae.cn/c/37-category/37
-```
+| 步骤 | 命令 |
+|------|------|
+| 更新 cookie.md | 从浏览器复制最新 Cookie 到 `/workspace/cookie.md` |
+| 发布 | `node scripts/publish-forum-pro.js`（在 scripts/ 目录下执行） |
+| 验证 | `node scripts/find-post.js` → `curl -sI` 确认链接 HTTP 200 |
+| 帖子URL | `https://forum.trae.cn/t/topic/{ID}` |
 
 ## Context Recovery Protocol
 
-When starting a new session in this workspace:
-
-1. **Read `.context/activeContext.md`** first — this tells you what's happening now
-2. **Read `.context/progress.md`** for full history and next steps
-3. **Read `.context/decisions.md`** only if you need to understand why something was done
-4. **Before ending a session**, update `.context/activeContext.md` with current state
-
-This protocol ensures continuity across context compression events. The `.context/` directory is the single source of truth for project state.
+新会话开始时：`.context/activeContext.md` → `.context/progress.md` → `.context/decisions.md`（按需）。结束前更新 activeContext.md 当前状态。
 
 ## Reference Documents
 
-- [skill-creator methodology](/data/user/skills/skill-creator) — 完整的 Skill 创建方法论（Progressive Disclosure / Evals / Benchmark / Iteration）
-- [trae-device-security spec](./.trae/specs/trae-device-security-skill/spec.md) — 已完成的 Skill 1 规格文档
-- [trae-forum-pro spec](./.trae/specs/trae-forum-pro-skill/spec.md) — 已完成的 Skill 2 规格文档
+- [trae-device-security spec](./.trae/specs/trae-device-security-skill/spec.md) — Skill 1 规格文档
+- [trae-forum-pro spec](./.trae/specs/trae-forum-pro-skill/spec.md) — Skill 2 规格文档
