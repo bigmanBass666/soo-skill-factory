@@ -29,10 +29,11 @@
 
 ### Playwright 环境（一键恢复！）
 - **⭐ 首选方案: `bash scripts/setup-deps.sh`** — 自动检测并安装所有依赖
-- **下载优先级**: 仓库tar.gz(0s,clone自带) → jsDelivr CDN(~10-30s) → GitHub Release(~1min) → playwright官方源(~16min兜底)
-- **仓库自带缓存**: `cache/playwright-chromium-linux.tar.gz` (98MB, UPX压缩+最小化, 随 clone 自动下载)
-- **jsDelivr CDN 地址**: `https://cdn.jsdelivr.net/gh/bigmanBass666/soo-skill-factory@main/cache/playwright-chromium-linux.tar.gz`
-- **GitHub Release 备用**: https://github.com/bigmanBass666/soo-skill-factory/releases/tag/v1.0.0-deps (162MB 原始版)
+- **下载优先级**: 仓库tar.gz(0s,clone自带) → npm在线安装 → playwright官方源(~16min兜底)
+- **仓库自带缓存**:
+  - `cache/playwright-chromium-linux.tar.gz` (98MB, UPX压缩chromium, 随clone自动下载)
+  - `cache/node-modules-playwright.tar.gz` (3.6MB, playwright npm包, 随clone自动下载)
+- **⚠️ jsDelivr 单文件限制20MB**: 仅 node_modules(3.6MB) 可走CDN, chromium(98MB) 不可用
 - Chromium 缓存路径: `/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome` (114MB 解压后)
 - 启动参数必须带: `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`
 - **gh CLI 已安装** (v2.92.0), 可用于管理 Release 和其他 GitHub 操作
