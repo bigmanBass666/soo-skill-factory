@@ -29,12 +29,11 @@
 
 ### Playwright 环境（一键恢复！）
 - **⭐ 首选方案: `bash scripts/setup-deps.sh`** — 自动检测并安装所有依赖
-- **下载优先级**: 仓库tar.gz(0s,clone自带) → workspace缓存(~1s) → jsDelivr CDN(~10-30s) → GitHub Release(~1min) → playwright官方源(~16min兜底)
+- **下载优先级**: 仓库tar.gz(0s,clone自带) → jsDelivr CDN(~10-30s) → GitHub Release(~1min) → playwright官方源(~16min兜底)
 - **仓库自带缓存**: `cache/playwright-chromium-linux.tar.gz` (98MB, UPX压缩+最小化, 随 clone 自动下载)
 - **jsDelivr CDN 地址**: `https://cdn.jsdelivr.net/gh/bigmanBass666/soo-skill-factory@main/cache/playwright-chromium-linux.tar.gz`
 - **GitHub Release 备用**: https://github.com/bigmanBass666/soo-skill-factory/releases/tag/v1.0.0-deps (162MB 原始版)
 - Chromium 缓存路径: `/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome` (114MB 解压后)
-- Workspace 持久缓存: `/workspace/.cache/playwright-chromium/` (跨会话保留)
 - 启动参数必须带: `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`
 - **gh CLI 已安装** (v2.92.0), 可用于管理 Release 和其他 GitHub 操作
 
@@ -58,9 +57,9 @@
 ### 本地关键文件
 | 文件 | 内容 |
 |------|------|
-| `/workspace/competition-post.md` | device-security 参赛帖（含正确链接） |
-| `/workspace/forum-pro-competition-post.md` | forum-pro 参赛帖（含正确链接） |
-| `/workspace/trae-workflow-automator-competition-post.md` | workflow-automator 参赛帖（含正确链接） |
+| `posts/device-security-competition-post.md` | device-security 参赛帖（含正确链接） |
+| `posts/forum-pro-competition-post.md` | forum-pro 参赛帖（含正确链接） |
+| `posts/trae-workflow-automator-competition-post.md` | workflow-automator 参赛帖（含正确链接） |
 
 ### 下一步建议（供新 AI 参考）
 - 🥇 社区运营：用 forum-pro 回复高热度帖子，增加曝光

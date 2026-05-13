@@ -84,31 +84,26 @@ executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-
 
 ```
 workspace/
-├── trae-device-security/          # Skill 1: 账号安全管家 (#17079)
-│   ├── SKILL.md                    # 核心定义 (<500行)
-│   ├── references/                 # 参考数据 (best-practices, forum-data)
-│   ├── scripts/device-log.sh      # 设备日志管理脚本
-│   └── evals/evals.json           # 测试用例定义
-├── trae-forum-pro/                # Skill 2: 论坛社区助手 (#17166)
-│   ├── SKILL.md                    # 核心定义 (475行)
-│   ├── references/                 # 参考数据 (forum-guide, hot-topics, post-templates)
-│   ├── scripts/forum-search.sh    # 论坛搜索辅助脚本
-│   └── evals/evals.json           # 测试用例定义
-├── trae-*-workspace/               # 对应 Skill 的 benchmark 工作区
-│   └── iteration-1/               # 第1轮评估结果
-│       ├── eval-{1,2,3}/          # 每个测试场景
-│       │   ├── with_skill/        # 带 Skill 的输出 + grading.json
-│       │   └── without_skill/     # baseline 输出 + grading.json
-│       └── benchmark.json         # 聚合评分结果
-├── .trae/specs/                   # Spec 文档 (spec-driven 开发)
-│   └── {skill-name}-skill/
-│       ├── spec.md                # 需求规格
-│       ├── tasks.md              # 任务清单
-│       └── checklist.md          # 验证检查表
-├── cookie.md                      # TRAE 论坛登录 Cookie（用于发帖脚本）
-├── publish-*.js                   # Playwright 发帖脚本
-├── *.skill                        # 打包好的 Skill 文件 (tar.gz)
-└── *-competition-post.md          # 参赛帖 Markdown 源文件
+├── skills/                        # 3个 SOLO Skill (完整源码)
+│   ├── trae-device-security/      # Skill 1: 账号安全管家 (#17079)
+│   │   ├── SKILL.md               # 核心定义
+│   │   ├── references/            # 参考数据
+│   │   ├── scripts/               # 设备日志管理脚本
+│   │   └── evals/                 # 测试用例
+│   ├── trae-forum-pro/            # Skill 2: 论坛社区助手 (#17166)
+│   │   ├── SKILL.md / references/ / scripts/ / evals/
+│   └── trae-workflow-automator/   # Skill 3: 工作流自动化 (#17234)
+│       ├── SKILL.md / references/ / scripts/ / evals/
+├── releases/                      # 打包好的 .skill 文件 (可下载安装)
+├── posts/                         # 参赛帖 Markdown 源文件
+├── scripts/                       # 工具脚本 (setup-deps.sh / publish-*.js)
+├── cache/                         # Playwright chromium 缓存 tar.gz (98MB, clone自带)
+├── .context/                      # 持久化上下文 (activeContext + progress + decisions)
+├── .trae/specs/                   # Spec 文档 (spec-driven 开发记录)
+├── cookie.md                      # TRAE 论坛登录 Cookie（不入库）
+├── AGENTS.md                      # 本文件 — AI Agent 指令
+├── README.md                      # 项目说明
+└── INSTALL.md                     # 安装指南
 ```
 
 ## Code Style & Conventions
@@ -208,4 +203,3 @@ This protocol ensures continuity across context compression events. The `.contex
 - [skill-creator methodology](/data/user/skills/skill-creator) — 完整的 Skill 创建方法论（Progressive Disclosure / Evals / Benchmark / Iteration）
 - [trae-device-security spec](./.trae/specs/trae-device-security-skill/spec.md) — 已完成的 Skill 1 规格文档
 - [trae-forum-pro spec](./.trae/specs/trae-forum-pro-skill/spec.md) — 已完成的 Skill 2 规格文档
-- [多AI协作体系文件完全指南](./多AI协作体系文件完全指南.md) — .context/ 体系的设计灵感来源

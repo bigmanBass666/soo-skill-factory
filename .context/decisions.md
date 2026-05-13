@@ -8,10 +8,10 @@
 - **影响**: 全部3个帖子链接修复验证通过（HTTP 200）
 
 ## 2026-05-13 | 建立依赖持久化方案
-- **决策**: 将 Playwright chromium 二进制缓存到 `/workspace/.cache/playwright-chromium/`，创建 `setup-deps.sh` 一键恢复脚本放入 repo
+- **决策**: 将 Playwright chromium 二进制打包为 98MB UPX压缩 tar.gz 放入仓库 `cache/` 目录，创建 `setup-deps.sh` 一键恢复脚本（5级优先级：本地→仓库tar.gz→jsDelivr→Release→官方源）
 - **理由**: 每次沙盒重置后重新下载 chromium 需要约16分钟，严重影响效率
-- **替代方案**: (1) Docker 镜像预装 (2) 每次重新下载 (3) 缓存到 /workspace
-- **影响**: 新环境只需跑一次 setup-deps.sh 即可恢复
+- **替代方案**: (1) Docker 镜像预装 (2) 每次重新下载 (3) GitHub Release (4) jsDelivr CDN
+- **影响**: 新环境只需跑一次 setup-deps.sh 即可恢复，clone 自带 tar.gz 可实现0秒解压
 
 ## 2026-05-13 | 确认第三篇帖子正确 ID
 - **决策**: 通过扫描 #17000-17400 范围确认 workflow-automator 帖子 ID 为 **#17234**（不是之前记录的 #17258）
