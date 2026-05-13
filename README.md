@@ -23,7 +23,7 @@
 - **定位**："造 Skill 的 Skill"——从构思到发布一站搞定
 - **核心能力**：4模块工作流(A:构思规划 → B:SKILL.md生成 → C:Evals/Benchmark → D:迭代/发布)
 - **Benchmark**：with_skill 100% vs baseline 50%（**+50%**，超额3.3倍）
-- **参赛帖**：（审核中）
+- **参赛帖**：[#17234](https://forum.trae.cn/t/topic/17234)
 - **适用场景**：从零创建Skill、写SKILL.md、跑benchmark、参加创作赛
 
 ## 🔥 核心亮点：递归自举
@@ -37,8 +37,8 @@
 | Skill | with_skill | baseline | 提升 | 状态 |
 |-------|-----------|----------|------|------|
 | device-security | 93.8% | 67.1% | **+26.7%** | ✅ 已发布 |
-| forum-pro | 100%0% | 83.3% | **+16.7%** | ✅ 已发布 |
-| workflow-automator | 100% | 50% | **+50%** | ⏳ 审核中 |
+| forum-pro | 100% | 83.3% | **+16.7%** | ✅ 已发布（已增料 v2） |
+| workflow-automator | 100% | 50% | **+50%** | ✅ 已发布 |
 
 测试方法：每个 eval 同时运行 with-skill 和 without-skill(baseline) 两组 subagent，通过断言评分后聚合。
 
@@ -78,8 +78,16 @@
 - SKILL.md Progressive Disclosure 三层加载架构
 - Eval-driven Development（18+ assertions per skill）
 - Pushy Description 触发优化策略
-- Playwright 自动化论坛发布
+- Playwright 自动化论坛发布/评论
 - Bash 脚手架工具链
+- Discourse API 帖子更新（PUT raw）
+
+## 📢 社区运营
+
+| 动作 | 状态 | 链接 |
+|------|------|------|
+| SpecForge #2000 评论 | ✅ 已发布 | [#55377](https://forum.trae.cn/t/topic/2000) |
+| forum-pro #17166 增料 | ✅ v2 上线 | 实战案例 + 社区痛点 + 协同组合 |
 
 ---
 
