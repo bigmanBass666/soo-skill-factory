@@ -262,7 +262,7 @@ Session Cookie 有效期约 30 天，过期后所有自动化操作无效。**�
 
 ### 陷阱 6：Playwright chromium 找不到
 
-`chromium.launch()` 默认找 headless_shell 但环境中未安装。**修复**：指定 `executablePath: '/opt/google/chrome/chrome'` 复用已安装的 Chrome。
+`chromium.launch()` 默认找 headless_shell 但环境中未安装。**修复**：先运行 `bash scripts/setup-deps.sh` 安装依赖，然后指定 `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`。
 
 ### 最佳实践 1：解释 WHY 而非只说 WHAT
 

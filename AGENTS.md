@@ -40,7 +40,8 @@ To use forum features:
 1. Check if `cookie.md` exists in your working directory
 2. If not, ask the user to provide their TRAE forum session cookie
 3. The cookie must include `_forum_session` and `sessionid` fields
-4. See `cookie.md.example` (if exists) for the expected format
+4. Cookie 格式: 每行一个 `name=value` 对，必须包含 `_forum_session` 和 `sessionid`
+5. 将 cookie 文件保存为 `/workspace/cookie.md`（脚本会自动读取）
 
 ### GitHub Repository
 
@@ -140,7 +141,7 @@ workspace/
 ### 脚本规范
 
 - Bash 脚本: shebang `#!/usr/bin/env bash` + `set -euo pipefail`
-- Node.js 脚本: commonjs (`require`)，chromium launch 加 `executablePath: '/opt/google/chrome/chrome'`
+- Node.js 脚本: commonjs (`require`)，chromium launch 加 `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`（先跑 `setup-deps.sh` 安装）
 - 中文注释
 
 ## Boundaries

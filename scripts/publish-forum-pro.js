@@ -16,7 +16,7 @@ function parseCookies(cookieStr, domain) {
 (async () => {
   const browser = await chromium.launch({ 
     headless: true,
-    executablePath: '/opt/google/chrome/chrome'
+    executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'
   });
   const context = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'

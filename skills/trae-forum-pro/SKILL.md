@@ -444,7 +444,7 @@ tags: [{标签列表}]
 
 **Cookie 检测细节：** 来源优先级 `~/.trae/cookie.md` > `/workspace/cookie.md` > 用户直接提供；必须同时包含 `sessionid` 和 `_forum_session` 字段；过期特征为访问论坛首页后页面仍显示"登录"按钮。
 
-**技术实现**：使用 Playwright MCP 或 Node.js playwright 脚本执行；Chromium 路径 `/opt/google/chrome/chrome`（headless）；编辑器填充使用 clipboard paste 方案（execCommand('copy') + Ctrl+V）。
+**技术实现**：使用 Playwright MCP 或 Node.js playwright 脚本执行；Chromium 路径通过 `setup-deps.sh` 安装到 `/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome`（headless）；编辑器填充使用 clipboard paste 方案（execCommand('copy') + Ctrl+V）。
 
 ## 7. 输出格式规范总览
 
