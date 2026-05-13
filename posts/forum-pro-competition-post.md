@@ -527,9 +527,15 @@ tags: [{标签列表}]
 
 ### 📦 安装方式
 
-1. 下载 `trae-forum-pro.skill` 文件
-2. 导入 SOLO：设置 → Skills → 导入 Skill
-3. 完成！无需额外配置
+**📥 方式一：下载 .skill 文件（推荐）**
+从 GitHub 仓库直接下载打包好的 Skill 文件：
+- **[trae-forum-pro.skill](https://github.com/bigmanBass666/soo-skill-factory/releases/download/main/releases/trae-forum-pro.skill)** (31KB)
+- 完整仓库：**https://github.com/bigmanBass666/soo-skill-factory**
+
+**📥 方式二：手动部署源码**
+1. Clone 仓库或下载源码
+2. 将 `skills/trae-forum-pro/` 目录放入你的 Skills 目录
+3. 在 TRAE 设置中刷新 Skill 列表
 
 ### 🚀 触发方式
 

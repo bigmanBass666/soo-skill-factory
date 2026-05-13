@@ -5,3 +5,6 @@ cookie.md
 trae-*-workspace/
 playwright-browsers/
 .DS_Store
+.cache/
+# 本地依赖缓存（chromium 377MB），不入库，仅本地持久化
+# 新会话运行 scripts/setup-deps.sh 恢复

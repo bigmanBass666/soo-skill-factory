@@ -280,9 +280,15 @@ SKILL.md 主文件仅 378 行（<500 行限制），详细规范移入 reference
 
 ### 安装步骤
 
-1. **下载** `trae-workflow-automator.skill` 文件
-2. **在 TRAE 中导入** Skill（设置 → Skills → 导入）
-3. 开始使用！
+**📥 方式一：下载 .skill 文件（推荐）**
+从 GitHub 仓库直接下载打包好的 Skill 文件：
+- **[trae-workflow-automator.skill](https://github.com/bigmanBass666/soo-skill-factory/releases/download/main/releases/trae-workflow-automator.skill)** (17KB)
+- 完整仓库：**https://github.com/bigmanBass666/soo-skill-factory**
+
+**📥 方式二：手动部署源码**
+1. Clone 仓库或下载源码
+2. 将 `skills/trae-workflow-automator/` 目录放入你的 Skills 目录
+3. 在 TRAE 设置中刷新 Skill 列表
 
 ### 触发示例
 
