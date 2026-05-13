@@ -1,0 +1,161 @@
+{
+  "skill_name": "trae-workflow-automator",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "skill-ideation",
+      "prompt": "我想参加 SOLO 技能创作赛，但不知道做什么 Skill 好。我平时用 TRAE 写前端代码，经常需要查 API 文档、复制代码片段、调试接口。帮我分析一下适合做什么方向的 Skill。",
+      "expected_output": "输出应包含 Skill 构思报告，涵盖：需求分析（痛点识别+场景定义）、核心能力拆解（2-4个模块）、差异化分析（与已有Skill对比）、技术可行性评估。报告应结构化，使用Markdown格式，包含表格和章节标题。",
+      "files": [],
+      "assertions": [
+        {
+          "id": "output_contains_ideation_report",
+          "type": "contains_any",
+          "description": "输出包含构思报告标题或标识（如'构思报告'、'💡 Skill 构思'等）",
+          "key_pattern": ["构思报告", "💡 Skill 构思", "Skill 构思报告"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_contains_pain_points",
+          "type": "contains_any",
+          "description": "输出包含痛点识别或需求分析内容",
+          "key_pattern": ["痛点", "需求分析", "痛点识别", "遇到什么问题", "核心问题"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_contains_modules",
+          "type": "contains_count",
+          "description": "输出包含 >=2 个核心能力模块（通过模块名或编号区分）",
+          "min_count": 2,
+          "key_pattern": ["模块 A", "模块 B", "模块 C", "模块 D", "Module A", "Module B"],
+          "weight": 1.5
+        },
+        {
+          "id": "output_contains_differentiation",
+          "type": "contains_any",
+          "description": "输出包含差异化分析（与已有Skill对比或独特价值说明）",
+          "key_pattern": ["差异化", "独特价值", "已有 Skill", "与已有", "互补", "不同之处"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_contains_feasibility",
+          "type": "contains_any",
+          "description": "输出包含技术可行性评估",
+          "key_pattern": ["可行性", "技术依赖", "工具依赖", "数据源", "风险点"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_contains_skill_name",
+          "type": "contains_regex",
+          "description": "输出包含建议的Skill名称（含trae-前缀或类似命名）",
+          "regex_pattern": "(?:Skill|技能).*(?:名称|名[称叫])|trae-[a-z]+|名称[：:].+",
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "skill-md-generation",
+      "prompt": "帮我创建一个代码审查 Skill 的 SKILL.md，要能检查代码质量、发现安全漏洞、给出改进建议。我打算参加 SOLO 技能创作赛，需要一个完整的 SKILL.md 文件。",
+      "expected_output": "输出应包含完整的 SKILL.md 文件内容，包括：YAML frontmatter（name/description/compatibility）、Skill概述、触发场景列表（>=10个）、2-4个核心模块（含工作流和输出格式模板）、输出格式规范、最佳实践。description应pushy且覆盖多个触发关键词。",
+      "files": [],
+      "assertions": [
+        {
+          "id": "output_has_frontmatter",
+          "type": "contains",
+          "description": "输出包含YAML frontmatter（---分隔符 + name/description字段）",
+          "key_pattern": ["---"],
+          "weight": 1.5
+        },
+        {
+          "id": "output_has_pushy_description",
+          "type": "contains_any",
+          "description": "description字段包含pushy触发关键词（代码审查/Code Review/安全漏洞/代码质量等）",
+          "key_pattern": ["代码审查", "Code Review", "安全漏洞", "代码质量", "即使未明确提及", "也应激活"],
+          "weight": 1.5
+        },
+        {
+          "id": "output_has_trigger_scenarios",
+          "type": "contains_count",
+          "description": "输出包含 >=5 个触发场景条目",
+          "min_count": 5,
+          "key_pattern": ["触发", "场景", "当用户", "用户说", "用户需要", "用户提到"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_has_workflow_steps",
+          "type": "contains_any",
+          "description": "输出包含工作流步骤描述（含箭头流程或编号步骤）",
+          "key_pattern": ["→", "Step 1", "步骤 1", "步骤1", "工作流"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_has_output_template",
+          "type": "contains_any",
+          "description": "输出包含输出格式模板（Markdown代码块中的模板）",
+          "key_pattern": ["输出格式", "模板", "```markdown", "报告结构"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_has_best_practices",
+          "type": "contains_any",
+          "description": "输出包含最佳实践章节",
+          "key_pattern": ["最佳实践", "Best Practice", "实践建议", "注意事项"],
+          "weight": 0.5
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "full-workflow-execution",
+      "prompt": "我想创建一个 TRAE 使用技巧收集 Skill，从构思到发布全帮我搞定。我希望这个 Skill 能自动收集社区里的 TRAE 使用技巧，整理分类，方便查阅和分享。",
+      "expected_output": "输出应覆盖完整工作流：1) Skill构思报告（含痛点/模块/差异化/可行性）；2) 完整的SKILL.md文件；3) evals.json测试用例建议；4) 参赛帖草稿或发布指引。输出应体现模块A到模块D的完整流程。",
+      "files": [],
+      "assertions": [
+        {
+          "id": "output_covers_ideation",
+          "type": "contains_any",
+          "description": "输出覆盖构思阶段（含痛点分析/模块拆解/差异化）",
+          "key_pattern": ["构思", "痛点", "差异化", "核心能力", "模块"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_covers_skill_md",
+          "type": "contains",
+          "description": "输出包含SKILL.md内容（含frontmatter的---分隔符）",
+          "key_pattern": ["---"],
+          "weight": 1.5
+        },
+        {
+          "id": "output_covers_evals",
+          "type": "contains_any",
+          "description": "输出覆盖eval测试设计（含测试用例/断言/benchmark建议）",
+          "key_pattern": ["eval", "测试用例", "断言", "assertion", "benchmark"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_covers_publish",
+          "type": "contains_any",
+          "description": "输出覆盖发布阶段（含参赛帖/发布流程/打包指引）",
+          "key_pattern": ["参赛帖", "发布", "打包", ".skill", "技能创作赛"],
+          "weight": 1.0
+        },
+        {
+          "id": "output_has_complete_modules",
+          "type": "contains_count",
+          "description": "输出包含 >=3 个不同的工作流阶段覆盖（构思/生成/测试/发布）",
+          "min_count": 3,
+          "key_pattern": ["构思", "生成", "SKILL.md", "eval", "测试", "发布", "参赛"],
+          "weight": 1.5
+        },
+        {
+          "id": "output_mentions_progressive_disclosure",
+          "type": "contains_any",
+          "description": "输出提及Progressive Disclosure或SKILL.md行数控制策略",
+          "key_pattern": ["Progressive Disclosure", "500 行", "<500", "行数控制", "references/"],
+          "weight": 0.5
+        }
+      ]
+    }
+  ]
+}
