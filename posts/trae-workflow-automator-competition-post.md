@@ -282,7 +282,7 @@ SKILL.md 主文件仅 378 行（<500 行限制），详细规范移入 reference
 
 **📥 方式一：下载 .skill 文件（推荐）**
 从 GitHub 仓库直接下载打包好的 Skill 文件：
-- **[trae-workflow-automator.skill](https://github.com/bigmanBass666/soo-skill-factory/releases/download/main/releases/trae-workflow-automator.skill)** (17KB)
+- **[trae-workflow-automator.skill](https://raw.githubusercontent.com/bigmanBass666/soo-skill-factory/main/releases/trae-workflow-automator.skill)** (17KB)
 - 完整仓库：**https://github.com/bigmanBass666/soo-skill-factory**
 
 **📥 方式二：手动部署源码**

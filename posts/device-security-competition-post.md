@@ -287,7 +287,7 @@ references/
 **📥 方式一：下载 .skill 文件（推荐）**
 
 从 GitHub 仓库直接下载打包好的 Skill 文件：
-- **[trae-device-security.skill](https://github.com/bigmanBass666/soo-skill-factory/releases/download/main/releases/trae-device-security.skill)** (24KB)
+- **[trae-device-security.skill](https://raw.githubusercontent.com/bigmanBass666/soo-skill-factory/main/releases/trae-device-security.skill)** (24KB)
 - 完整仓库：**https://github.com/bigmanBass666/soo-skill-factory**
 
 **📥 方式二：查看完整源码**
