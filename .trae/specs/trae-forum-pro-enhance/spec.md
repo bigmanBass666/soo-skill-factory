@@ -29,7 +29,7 @@ forum-pro Skill 当前只能"帮用户写好帖子"，但实际发帖需要依�
 **前置条件**：
 - 用户已确认帖子内容无误
 - `cookie.md` 包含有效的 TRAE 论坛 session Cookie
-- 环境安装了 playwright（`npm install playwright`）且 Chrome 可用（`/opt/google/chrome/chrome`）
+- 环境安装了 playwright（`bash scripts/setup-deps.sh`）且 Chrome 可用（`/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome`）
 
 **步骤**：
 
