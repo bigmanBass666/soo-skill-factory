@@ -5,12 +5,14 @@
 #
 # 下载优先级（从快到慢）:
 #   1. 本地已存在 → 跳过 (0s)
-#   2. 仓库内 cache/ node_modules tar.gz 解压 (~1s, clone 自带)
-#   3. 仓库内 cache/ chromium tar.gz 解压 (~2s, clone 自带)
-#   4. ⭐ jsDelivr CDN 下载 chromium (国内超快, ~10-30s)
-#   5. npm install playwright (~30s-2min, 取决于网络)
-#   6. apt 缺失包安装 (~10-30s, 仅~74KB下载)
-#   7. npx playwright install 兜底 (~10-16min)
+#   2. 仓库内 cache/ tar.gz 解压 (~2s, clone 自带)
+#   3. ⭐ jsDelivr CDN 下载 node_modules (<20MB限制, ~3s)
+#   4. npm install playwright (~30s-2min)
+#   5. apt 缺失包安装 (~10s, 仅~74KB下载)
+#   6. npx playwright install chromium 兜底 (~10-16min)
+#
+# ⚠️ jsDelivr 单文件限制 20MB，chromium(98MB) 无法走 CDN
+#    所以 chromium 只能从仓库 cache/ 或官方源获取
 #
 # jsDelivr: https://cdn.jsdelivr.net/gh/bigmanBass666/soo-skill-factory@main/cache/
 # ============================================================
@@ -39,9 +41,7 @@ NM_TAR="$PW_CACHE/node-modules-playwright.tar.gz"
 PW_TAR="$PW_CACHE/playwright-chromium-linux.tar.gz"
 
 RELEASE_REPO="bigmanBass666/soo-skill-factory"
-JSDELIVR_BASE="https://cdn.jsdelivr.net/gh/${RELEASE_REPO}@main/cache"
-
-JSDELIVR_CHROME="${JSDELIVR_BASE}/playwright-chromium-linux.tar.gz"
+JSDELIVR_NM="https://cdn.jsdelivr.net/gh/${RELEASE_REPO}@main/cache/node-modules-playwright.tar.gz"
 
 APT_PKGS="libatk1.0-0t libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1"
 
@@ -79,7 +79,7 @@ else
   warn "跳过系统依赖 (--skip-apt)"
 fi
 
-# ── Step 2: Playwright npm 包 — 优先从缓存恢复 ────────
+# ── Step 2: Playwright npm 包 — 缓存 > jsDelivr > npm ─────
 log "Step 2/5: 检查 playwright npm 包..."
 
 if [ -d "$NM_TARGET/playwright-core" ] && [ "$FORCE" != "--force" ]; then
@@ -91,20 +91,40 @@ elif [ -f "$NM_TAR" ]; then
   if [ -f "$NM_TARGET/playwright-core/package.json" ]; then
     ok "node_modules 从缓存恢复完成 ⚡"
   else
-    err "node_modules 缓存解压失败！回退到 npm 安装..."
+    err "node_modules 缓存解压失败！回退..."
     rm -rf "$NM_TARGET"
-    cd /workspace && npm config set registry https://registry.npmmirror.com && npm install playwright 2>&1 | tail -5 || true
-    ok "playwright npm 包安装完成（在线回退）"
   fi
-else
-  log "安装 playwright npm 包..."
+fi
+
+if [ ! -d "$NM_TARGET/playwright-core" ]; then
+  if [ "$FORCE" != "--force" ]; then
+    log "⚡ 尝试从 jsDelivr CDN 下载 node_modules (<20MB)..."
+    TMP_NM="/tmp/pw-nm-jsdl.tar.gz"
+    if curl -L --max-time 30 -o "$TMP_NM" "$JSDELIVR_NM" 2>/dev/null && [ -s "$TMP_NM" ]; then
+      mkdir -p "$NM_TARGET"
+      tar -xzf "$TMP_NM" -C "$REPO_DIR/"
+      rm -f "$TMP_NM"
+      if [ -f "$NM_TARGET/playwright-core/package.json" ]; then
+        ok "node_modules 从 jsDelivr 恢复完成 ⚡"
+      else
+        rm -rf "$NM_TARGET"
+      fi
+    else
+      rm -f "$TMP_NM"
+      warn "jsDelivr 不可用"
+    fi
+  fi
+fi
+
+if [ ! -d "$NM_TARGET/playwright-core" ]; then
+  log "npm install playwright..."
   cd /workspace && npm config set registry https://registry.npmmirror.com && npm install playwright 2>&1 | tail -5 || true
   ok "playwright npm 包安装完成"
 fi
 
 export PATH="$NM_TARGET/.bin:$PATH"
 
-# ── Step 3: Chromium 浏览器二进制 ────────────────────
+# ── Step 3: Chromium 浏览器二进制 — 仅缓存或官方源 ────
 log "Step 3/5: 检查 chromium 二进制..."
 
 install_chromium_from_local_tar() {
@@ -116,27 +136,6 @@ install_chromium_from_local_tar() {
     ok "chromium 从仓库 tar.gz 解压完成 ⚡"
   else
     err "解压后未找到 chrome 二进制！"
-    return 1
-  fi
-}
-
-install_chromium_from_jsdelivr() {
-  log "⚡ 从 jsDelivr CDN 下载 chromium（国内加速）..."
-  log "   URL: ${JSDELIVR_CHROME}"
-  local tmp_tar="/tmp/pw-chrome-jsdl.tar.gz"
-  if command -v curl &>/dev/null; then
-    curl -L --progress-bar "$JSDELIVR_CHROME" -o "$tmp_tar" 2>&1 || { warn "jsDelivr 失败"; rm -f "$tmp_tar"; return 1; }
-  else
-    wget -q --show-progress "$JSDELIVR_CHROME" -O "$tmp_tar" 2>&1 || { rm -f "$tmp_tar"; return 1; }
-  fi
-  mkdir -p "$PW_TARGET"
-  tar -xzf "$tmp_tar" -C "$PW_TARGET/../"
-  rm -f "$tmp_tar"
-  if [ -f "$CHROME_BIN" ]; then
-    ok "chromium 通过 jsDelivr CDN 下载完成 ⚡"
-    return 0
-  else
-    err "jsDelivr 解压后未找到 chrome！"
     return 1
   fi
 }
@@ -156,11 +155,8 @@ if [ -f "$CHROME_BIN" ] && [ "$FORCE" != "--force" ]; then
 elif [ -f "$PW_TAR" ]; then
   install_chromium_from_local_tar "$PW_TAR"
 
-elif install_chromium_from_jsdelivr; then
-  ok "jsDelivr CDN 下载成功 ✨"
-
 else
-  warn "所有快速方式均失败，使用 playwright 官方源下载..."
+  warn "cache/tar.gz 不存在，使用 playwright 官方源下载..."
   install_chromium_from_playwright
   if [ -f "$CHROME_BIN" ]; then
     ok "chromium 通过官方源安装完成"
@@ -206,4 +202,4 @@ echo ""
 echo "缓存状态:"
 if [ -f "$PW_TAR" ]; then echo "  ⚡chromium tar.gz: $PW_TAR ($(ls -lh "$PW_TAR" | awk '{print $5}'))"; fi
 if [ -f "$NM_TAR" ]; then echo "  ⚡node_modules tar.gz: $NM_TAR ($(ls -lh "$NM_TAR" | awk '{print $5}'))"; fi
-echo "  jsDelivr CDN: $JSDELIVR_CHROME"
+echo "  jsDelivr (仅<20MB): $JSDELIVR_NM"
