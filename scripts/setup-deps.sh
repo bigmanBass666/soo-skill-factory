@@ -5,11 +5,14 @@
 #
 # 下载优先级（从快到慢）:
 #   1. 本地已存在 → 跳过 (0s)
-#   2. 仓库内 .cache/ 或 /workspace/.cache/ 复制 (~5s)
-#   3. ⭐ GitHub Release 下载 (~30s-2min, 取决于网络)
-#   4. npx playwright install 兜底 (~10-16min)
+#   2. 仓库内 cache/ tar.gz 解压 (~2s, clone 自带)
+#   3. workspace 持久缓存复制 (~1s)
+#   4. ⭐⭐ jsDelivr CDN 下载 (国内超快, ~10-30s)
+#   5. ⭐ GitHub Release 下载 (~30s-2min)
+#   6. npx playwright install 兜底 (~10-16min)
 #
-# Release 地址: https://github.com/bigmanBass666/soo-skill-factory/releases/tag/v1.0.0-deps
+# Release: https://github.com/bigmanBass666/soo-skill-factory/releases/tag/v1.0.0-deps
+# jsDelivr: https://cdn.jsdelivr.net/gh/bigmanBass666/soo-skill-factory@main/cache/playwright-chromium-linux.tar.gz
 # ============================================================
 set -euo pipefail
 
@@ -28,16 +31,16 @@ done
 # ── 配置 ──────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
-PW_CACHE="$REPO_DIR/.cache/playwright-chromium"
+PW_CACHE="$REPO_DIR/cache"
 FALLBACK_CACHE="/workspace/.cache/playwright-chromium"
 PW_TARGET="$HOME/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64"
 CHROME_BIN="$PW_TARGET/chrome"
 
-# GitHub Release 信息
 RELEASE_REPO="bigmanBass666/soo-skill-factory"
 RELEASE_TAG="v1.0.0-deps"
 RELEASE_FILE="playwright-chromium-linux.tar.gz"
 RELEASE_URL="https://github.com/${RELEASE_REPO}/releases/download/${RELEASE_TAG}/${RELEASE_FILE}"
+JSDELIVR_URL="https://cdn.jsdelivr.net/gh/${RELEASE_REPO}@main/cache/${RELEASE_FILE}"
 
 log() { echo -e "${CYAN}[setup-deps]${NC} $*"; }
 ok()  { echo -e "${GREEN}✅ $*${NC}"; }
@@ -82,47 +85,58 @@ install_chromium_from_local_cache() {
   ok "chromium 从缓存恢复完成"
 }
 
-install_chromium_from_release() {
-  log "⬇️  从 GitHub Release 下载 chromium (${RELEASE_TAG})..."
-  log "   URL: ${RELEASE_URL}"
-
-  local tmp_tar="/tmp/pw-chrome-download.tar.gz"
-
-  # 尝试 curl（更快，支持进度显示）
-  if command -v curl &>/dev/null; then
-    curl -L --progress-bar "$RELEASE_URL" -o "$tmp_tar" 2>&1 || {
-      warn "curl 下载失败，尝试 wget..."
-      wget -q --show-progress "$RELEASE_URL" -O "$tmp_tar" 2>&1 || {
-        err "GitHub Release 下载失败！请检查网络或手动下载:"
-        err "  $RELEASE_URL"
-        rm -f "$tmp_tar"
-        return 1
-      }
-    }
+install_chromium_from_local_tar() {
+  local src="$1"
+  log "从仓库 cache/ tar.gz 解压 chromium (98MB, UPX压缩+最小化)..."
+  mkdir -p "$PW_TARGET"
+  tar -xzf "$src" -C "$PW_TARGET/../"
+  if [ -f "$CHROME_BIN" ]; then
+    ok "chromium 从仓库 tar.gz 解压完成 ⚡"
   else
-    wget -q --show-progress "$RELEASE_URL" -O "$tmp_tar" 2>&1 || {
-      err "wget 下载失败！"
-      rm -f "$tmp_tar"
-      return 1
-    }
+    err "解压后未找到 chrome 二进制！"
+    return 1
   fi
+}
 
-  # 解压到目标位置
+install_chromium_from_jsdelivr() {
+  log "⚡ 从 jsDelivr CDN 下载 chromium（国内加速）..."
+  log "   URL: ${JSDELIVR_URL}"
+  local tmp_tar="/tmp/pw-chrome-jsdl.tar.gz"
+  if command -v curl &>/dev/null; then
+    curl -L --progress-bar "$JSDELIVR_URL" -o "$tmp_tar" 2>&1 || { warn "jsDelivr 失败，尝试 GitHub Release..."; rm -f "$tmp_tar"; return 1; }
+  else
+    wget -q --show-progress "$JSDELIVR_URL" -O "$tmp_tar" 2>&1 || { rm -f "$tmp_tar"; return 1; }
+  fi
   mkdir -p "$PW_TARGET"
   tar -xzf "$tmp_tar" -C "$PW_TARGET/../"
   rm -f "$tmp_tar"
-
   if [ -f "$CHROME_BIN" ]; then
-    ok "chromium 从 Release 下载并解压完成"
-
-    # 缓存到 workspace 供下次使用
-    log "缓存到 /workspace/.cache/..."
-    rm -rf "$FALLBACK_CACHE"
-    mkdir -p "$FALLBACK_CACHE"
-    cp -r "$PW_TARGET" "$FALLBACK_CACHE/"
+    ok "chromium 通过 jsDelivr CDN 下载完成 ⚡"
+    rm -rf "$FALLBACK_CACHE" && mkdir -p "$FALLBACK_CACHE" && cp -r "$PW_TARGET" "$FALLBACK_CACHE/" 2>/dev/null || true
     return 0
   else
-    err "解压后未找到 chrome 二进制！"
+    err "jsDelivr 解压后未找到 chrome！"
+    return 1
+  fi
+}
+
+install_chromium_from_release() {
+  log "⬇️  从 GitHub Release 下载 chromium (${RELEASE_TAG})..."
+  local tmp_tar="/tmp/pw-chrome-download.tar.gz"
+  if command -v curl &>/dev/null; then
+    curl -L --progress-bar "$RELEASE_URL" -o "$tmp_tar" 2>&1 || { warn "curl 失败，尝试 wget..."; wget -q --show-progress "$RELEASE_URL" -O "$tmp_tar" 2>&1 || { rm -f "$tmp_tar"; return 1; } }
+  else
+    wget -q --show-progress "$RELEASE_URL" -O "$tmp_tar" 2>&1 || { rm -f "$tmp_tar"; return 1; }
+  fi
+  mkdir -p "$PW_TARGET"
+  tar -xzf "$tmp_tar" -C "$PW_TARGET/../"
+  rm -f "$tmp_tar"
+  if [ -f "$CHROME_BIN" ]; then
+    ok "chromium 从 Release 下载完成"
+    rm -rf "$FALLBACK_CACHE" && mkdir -p "$FALLBACK_CACHE" && cp -r "$PW_TARGET" "$FALLBACK_CACHE/" 2>/dev/null || true
+    return 0
+  else
+    err "Release 解压后未找到 chrome！"
     return 1
   fi
 }
@@ -132,36 +146,35 @@ install_chromium_from_playwright() {
   npx playwright install chromium 2>&1 || {
     warn "playwright 安装失败，尝试手动下载..."
     mkdir -p "$PW_TARGET"
-    cd /tmp && \
-      wget -q --show-progress "https://cdn.playwright.dev/builds/cft/148.0.7778.96/linux64/chrome-linux64.zip" \
-        -O chrome.zip 2>&1 && \
-      unzip -o chrome.zip -d "$PW_TARGET/../" && \
-      rm -f chrome.zip
+    cd /tmp && wget -q --show-progress "https://cdn.playwright.dev/builds/cft/148.0.7778.96/linux64/chrome-linux64.zip" -O chrome.zip 2>&1 && unzip -o chrome.zip -d "$PW_TARGET/../" && rm -f chrome.zip
   }
 }
 
-# 主逻辑：按优先级尝试各种来源
+# ═══ 主逻辑：按优先级尝试 ═══
 if [ -f "$CHROME_BIN" ] && [ "$FORCE" != "--force" ]; then
   ok "chromium 已存在，跳过 ($CHROME_BIN)"
 
-elif [ -d "$PW_CACHE/chrome-linux64" ] && [ -f "$PW_CACHE/chrome-linux64/chrome" ]; then
-  install_chromium_from_local_cache "$PW_CACHE"
+# 优先级2: 仓库内 cache/ tar.gz（clone 自带，解压即用）
+elif [ -f "$PW_CACHE/$RELEASE_FILE" ]; then
+  install_chromium_from_local_tar "$PW_CACHE/$RELEASE_FILE"
 
+# 优先级3: workspace 持久缓存
 elif [ -d "$FALLBACK_CACHE/chrome-linux64" ] && [ -f "$FALLBACK_CACHE/chrome-linux64/chrome" ]; then
   install_chromium_from_local_cache "$FALLBACK_CACHE"
 
+# 优先级4: ⚡ jsDelivr CDN（国内超快）
+elif install_chromium_from_jsdelivr; then
+  ok "jsDelivr CDN 下载成功 ✨"
+
+# 优先级5: GitHub Release
 elif install_chromium_from_release; then
-  ok "chromium 通过 GitHub Release 安装成功 ✨"
+  ok "GitHub Release 安装成功 ✨"
 
 else
   warn "所有快速方式均失败，使用 playwright 官方源下载..."
   install_chromium_from_playwright
-
   if [ -f "$CHROME_BIN" ]; then
-    # 缓存结果
-    rm -rf "$FALLBACK_CACHE"
-    mkdir -p "$FALLBACK_CACHE"
-    cp -r "$PW_TARGET" "$FALLBACK_CACHE/" 2>/dev/null || true
+    rm -rf "$FALLBACK_CACHE" && mkdir -p "$FALLBACK_CACHE" && cp -r "$PW_TARGET" "$FALLBACK_CACHE/" 2>/dev/null || true
     ok "chromium 通过官方源安装完成（已缓存）"
   else
     err "chromium 安装彻底失败！"
@@ -193,10 +206,8 @@ echo ""
 echo "Playwright 启动参数:"
 echo "  executablePath: '$CHROME_BIN'"
 echo ""
-echo "环境变量（可选）:"
-echo "  PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright"
-echo ""
-echo "缓存位置:"
-echo "  chromium:   $FALLBACK_CACHE/ (workspace 持久)"
-echo "  npm:        /workspace/node_modules/"
-echo "  Release:    $RELEASE_URL"
+echo "缓存/下载位置:"
+echo "  ⚡仓库自带:   $PW_CACHE/$RELEASE_FILE (clone 即有, 98MB)"
+echo "  workspace:   $FALLBACK_CACHE/ (跨会话持久)"
+echo "  ⚡jsDelivr:  $JSDELIVR_URL (CDN 加速)"
+echo "  GitHub Rel:  $RELEASE_URL (备用)"
