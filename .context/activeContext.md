@@ -27,10 +27,16 @@
 - 用途: Discourse API 认证（Playwright 浏览器内 fetch 需要）
 - 注意: cookie.md **未提交到 Git**（.gitignore 中排除），每次新环境需手动提供
 
-### Playwright 环境
-- Chromium 缓存路径: `/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome` (277MB)
-- **沙盒重置后需要重新安装!** 恢复脚本: `/workspace/setup-deps.sh` 或 repo 内 `scripts/setup-deps.sh`
+### Playwright 环境（一键恢复！）
+- **⭐ 首选方案: `bash scripts/setup-deps.sh`** — 自动检测并安装所有依赖
+- **下载优先级**: 本地缓存(0s) → GitHub Release(~1min) → playwright官方源(~16min兜底)
+- **GitHub Release 地址**: https://github.com/bigmanBass666/soo-skill-factory/releases/tag/v1.0.0-deps
+  - 文件: `playwright-chromium-linux.tar.gz` (162MB, gzip 压缩)
+  - 直接下载: `curl -L 'https://github.com/bigmanBass666/soo-skill-factory/releases/download/v1.0.0-deps/playwright-chromium-linux.tar.gz' -o pw.tar.gz`
+- Chromium 缓存路径: `/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome` (377MB 解压后)
+- Workspace 持久缓存: `/workspace/.cache/playwright-chromium/` (跨会话保留)
 - 启动参数必须带: `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`
+- **gh CLI 已安装** (v2.92.0), 可用于管理 Release 和其他 GitHub 操作
 
 ### Discourse API 经验教训（重要！）
 1. **PUT /posts/{id}.json 的 `raw` 字段会替换整个帖子内容**，不是追加！之前因此覆盖了两篇帖子的完整内容
