@@ -24,12 +24,13 @@ If this is your **first time** seeing this project:
 | Design specs | `.trae/specs/` | Spec documents for each skill |
 | This file | `AGENTS.md` | Project instructions for AI agents |
 
-### Project Status (as of last update)
+### Project Status (as of 2026-05-13)
 
-- ✅ Skill 1: trae-device-security (#17079) — Published
-- ✅ Skill 2: trae-forum-pro (#17166) — Published
-- ⏳ Skill 3: trae-workflow-automator — Awaiting moderation
-- 🎯 Next: Update contest posts with GitHub links, community engagement
+- ✅ Skill 1: trae-device-security (#17079, post 79889) — Published + links fixed (v6)
+- ✅ Skill 2: trae-forum-pro (#17166, post 80287) — Published + links fixed (v6)
+- ✅ Skill 3: trae-workflow-automator (#17234, post 80594) — Published + links added (v2)
+- 🎯 All 3 posts verified: download links return HTTP 200
+- 📋 Next: Community engagement / Iteration 2 optimization / 社媒传播
 
 ### Critical: Cookie Configuration
 
@@ -49,15 +50,21 @@ To use forum features:
 ## Dev Environment Tips
 
 ```bash
-# 安装依赖
-npm install
+# 一键恢复依赖（推荐！包含系统依赖 + npm + playwright chromium）
+bash scripts/setup-deps.sh
 
-# 安装 Playwright 浏览器（需配国内镜像）
-export PLAYWRIGHT_DOWNLOAD_HOST=https://npmmirror.com/mirrors/playwright/
+# 或者手动安装：
+# 1. 系统依赖
+apt-get install -y libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 \
+  libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2
+
+# 2. npm + Playwright
+npm config set registry https://registry.npmmirror.com
+npm install
 npx playwright install chromium
 
-# Playwright MCP 已预装 Chrome 在 /opt/google/chrome/chrome
-# 脚本中用 executablePath: '/opt/google/chrome/chrome' 复用
+# 3. Chromium 路径（脚本中必须指定）
+executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'
 ```
 
 ## Build & Test
@@ -145,11 +152,16 @@ workspace/
 ## Common Pitfalls
 
 - **Cookie 过期**: `cookie.md` 中的 session 会过期（约 30 天），发帖失败时先运行 `debug-login.js` 检查登录状态。关键标志：页面显示"登录"按钮 = 过期了
-- **Playwright 浏览器缺失**: `chromium.launch()` 默认找 headless_shell，但本环境只有 `/opt/google/chrome/chrome`。脚本中必须指定 `executablePath`
+- **Playwright 浏览器缺失**: 新沙盒环境没有 chromium。**先跑 `bash scripts/setup-deps.sh`**。脚本中必须指定 `executablePath: '/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome'`
+- **Discourse PUT API 会替换整个帖子内容**: `PUT /posts/{id}.json` 的 `raw` 字段是**整体替换**不是追加！更新帖子时必须传入完整内容（从本地 .md 文件读取），否则会丢失原有内容
+- **GitHub 下载链接格式**: 必须用 `raw.githubusercontent.com/{user}/{repo}/main/releases/{file}` 格式，不要用 `releases/download` 格式（需要创建 GitHub Release 才能工作）
+- **Node.js 直接 https 到论坛会 ETIMEDOUT**: 必须用 Playwright 页面内的 `page.evaluate(() => fetch(...))`
 - **正则假阴性**: Markdown 表格的 `|` 分隔符会导致跨单元格正则匹配失败。元数据推荐用内联格式 `📊 N 回复 / N 浏览` 而非纯表格
 - **Discourse ProseMirror 编辑器**: 论坛编辑器不是普通 textarea，填充正文需要用 clipboard 粘贴方案（execCommand('copy') + Ctrl+V），ProseMirror API 直接调用可能因 view.state 未就绪而失败
 - **目录命名一致性**: 创建 Skill 时注意目录名与 Skill name 完全一致（如 `trae-device-security` 不能写成 `tae-device-security`），否则打包会遗漏文件
 - **npm 镜像**: 本环境默认 registry 是官方源，安装依赖前先 `npm config set registry https://registry.npmmirror.com`
+- **page.evaluate 多参数**: 必须包成对象传递 `({a, b}) => {...}, {a, b}`，不能直接传多个参数
+- **帖子 ID 不能凭记忆**: 用 API 搜索确认，#17258 是别人的帖子，我们的 workflow-automator 是 #17234
 
 ## Verification Loop
 

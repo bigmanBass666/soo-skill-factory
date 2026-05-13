@@ -2,6 +2,22 @@
 
 > 按时间倒序排列，最新决策在最前
 
+## 2026-05-13 | 修复下载链接 + 更新全部3个帖子
+- **决策**: 用 `raw.githubusercontent.com` 格式替换 `releases/download` 格式，通过 Playwright PUT API 推送本地完整 .md 文件
+- **理由**: releases/download 需要 GitHub Release（从未创建）→ 404；raw.githubusercontent.com 直接提供原始文件 → 200
+- **影响**: 全部3个帖子链接修复验证通过（HTTP 200）
+
+## 2026-05-13 | 建立依赖持久化方案
+- **决策**: 将 Playwright chromium 二进制缓存到 `/workspace/.cache/playwright-chromium/`，创建 `setup-deps.sh` 一键恢复脚本放入 repo
+- **理由**: 每次沙盒重置后重新下载 chromium 需要约16分钟，严重影响效率
+- **替代方案**: (1) Docker 镜像预装 (2) 每次重新下载 (3) 缓存到 /workspace
+- **影响**: 新环境只需跑一次 setup-deps.sh 即可恢复
+
+## 2026-05-13 | 确认第三篇帖子正确 ID
+- **决策**: 通过扫描 #17000-17400 范围确认 workflow-automator 帖子 ID 为 **#17234**（不是之前记录的 #17258）
+- **理由**: #17258 是别人（beiyuii）的 Personal API 帖子；#17234 才是我们的
+- **教训**: 不能凭记忆假设帖子 ID，必须搜索验证
+
 ## 2026-05-12 | 建立 .context/ 持久化上下文体系
 - **决策**：采用 Tocket 最小结构（activeContext + progress + decisions）建立 .context/ 目录
 - **理由**：AI Agent 上下文会压缩，导致跨会话进度丢失。需要文件级持久化记忆
