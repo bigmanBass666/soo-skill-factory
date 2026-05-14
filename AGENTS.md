@@ -110,7 +110,7 @@ Skill 开发完成后的自检清单：
 3. 6组 eval 全部完成 (3 with-skill + 3 baseline)
 4. 6个 grading.json 存在且 format 正确
 5. benchmark.json 含 summary/per_eval/analysis
-6. `.skill` 文件 tar.gz 格式，解压后完整
+6. `.skill` 文件 zip 格式，解压后完整
 7. `.trae/specs/{name}-skill/checklist.md` 全通过
 
 ## Forum Publishing Workflow

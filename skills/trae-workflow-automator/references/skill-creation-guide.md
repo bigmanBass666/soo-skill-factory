@@ -289,4 +289,4 @@ SKILL.md 是"操作手册"不是"百科全书"：工作流和关键模板放 SKI
 7. Eval 数量：>= 3 个 eval，>= 15 个总断言
 8. grading.json：使用 text/passed/evidence 严格字段名
 9. benchmark.json：含 run_summary.with_skill/without_skill/delta
-10. .skill 打包：tar.gz 格式，解压后文件完整
+10. .skill 打包：zip 格式，解压后 SKILL.md 在根目录

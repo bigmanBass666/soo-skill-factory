@@ -66,7 +66,7 @@ A: 检查 description 中的触发关键词是否覆盖了你的表达方式。�
 A: 可以！三个 Skill 互补不冲突。推荐全部安装以获得最佳体验。
 
 **Q: .skill 文件是什么格式？**
-A: tar.gz 压缩包，内含 SKILL.md + references/ + scripts/ + evals/。TRAE IDE 可直接识别。
+A: zip 压缩包，内含 SKILL.md + references/ + scripts/ + evals/。TRAE IDE 可直接识别。
 
 **Q: 安装后可以修改吗？**
 A: 可以！所有源码都在 skills/ 目录下，你可以根据自己的需求定制。

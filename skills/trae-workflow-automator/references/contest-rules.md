@@ -51,7 +51,7 @@ https://forum.trae.cn/c/37-category/37
 ### 附件要求
 
 - 必须附带 `.skill` 文件
-- `.skill` 文件采用 `tar.gz` 格式打包
+- `.skill` 文件采用 `zip` 格式打包
 - 打包内容应包含 SKILL.md、references/、scripts/、evals/ 等完整目录结构
 
 ## 三、评审标准
@@ -133,7 +133,7 @@ https://bytedance.larkoffice.com/share/base/form/shrcn7YanxCtmlZPmpUJtyhr9Re
 - [ ] scripts/ 目录包含辅助脚本（如有）
 - [ ] evals/ 目录包含测试用例（>= 3 个 eval，>= 15 个断言）
 - [ ] benchmark 数据已生成
-- [ ] .skill 文件已打包为 tar.gz 格式
+- [ ] .skill 文件已打包为 zip 格式
 - [ ] 参赛帖已发布到正确板块（SOLO 技能创作赛专区）
 - [ ] 参赛帖标题符合格式要求且内容包含七章标准格式
 - [ ] 抽奖问卷已填写

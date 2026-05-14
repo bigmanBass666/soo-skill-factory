@@ -325,7 +325,7 @@ description 是 Skill 触发的唯一入口，必须"pushy"：
 ### D.5 .skill 文件打包
 
 ```bash
-tar czf {skill-name}.skill -C /path/to/parent {skill-name}/
+zip -r {skill-name}.skill {skill-name}/
 ```
 
 打包内容：SKILL.md + references/ + scripts/ + evals/
