@@ -225,9 +225,14 @@ cmd_pack() {
 
   local output_file="${parent_dir}/${skill_name}.skill"
 
-  info "Packaging Skill: $skill_name"
+  info "Packaging Skill: $skill_name (zip format)"
 
-  tar czf "$output_file" -C "$parent_dir" "$skill_name/"
+  if ! command -v zip &>/dev/null; then
+    warn "zip command not found, falling back to tar.gz (may cause nested directory issue)"
+    tar czf "$output_file" -C "$parent_dir" "$skill_name/"
+  else
+    (cd "$parent_dir/$skill_name" && zip -rq "$output_file" .)
+  fi
 
   if [ ! -f "$output_file" ]; then
     error "Failed to create .skill archive"
