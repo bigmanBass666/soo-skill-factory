@@ -418,18 +418,20 @@ tags: [{标签列表}]
 | 经验分享 | https://forum.trae.cn/c/9-category/9 |
 | 技能创作赛 | https://forum.trae.cn/c/37-category/37 |
 
-**发布流程（10 步）：**
+**发布流程（12 步）：**
 
 1. **Cookie 检查** — 读取 cookie.md，验证 `_forum_session` 和 `sessionid` 字段存在
 2. **目标页面导航** — 根据帖子类型导航到对应板块
-3. **打开编辑器** — 点击 #create-topic 按钮，等待加载
-4. **填写标题** — 向 #reply-title 输入标题
-5. **填写正文** — 使用 clipboard 方案向 .d-editor-input 粘贴 Markdown（ProseMirror API 为首选 fallback 到 clipboard）
-6. **添加标签** — 通过 .mini-tag-chooser 添加推荐标签
-7. **点击发布** — 点击 .save-or-cancel .create 按钮
-8. **等待跳转** — 监听 URL 变为 /t/topic/ 格式，提取 ID
-9. **验证发布** — 访问帖子 URL 确认内容完整（>100字符）
-10. **记录发布** — 将 URL 写入 published.json
+3. **打开编辑器** — 点击"新建话题"按钮，等待加载完成（约 2-3 秒）
+4. **填写标题** — 向标题输入框输入标题
+5. **确认编辑模式** — 检查编辑器是否在 Markdown 模式（底部应显示"使用 Markdown、BBCode 或 HTML 进行排版"）。如果不是，按 Ctrl+M 切换
+6. **填写正文** — 点击内容区域，使用 Ctrl+V 粘贴 Markdown 内容。**重要**：粘贴后等待 2-3 秒让编辑器处理
+7. **预览验证** — 检查右侧预览是否正确渲染了 Markdown（标题、代码块、表格等应正确显示）
+8. **添加标签** — 通过标签选择器添加推荐标签
+9. **点击发布** — 点击"创建话题"按钮
+10. **处理提示** — 如果出现"帖子需要审批"提示，点击"确定"关闭
+11. **验证发布** — 访问帖子 URL 确认内容完整（>100 字符）
+12. **记录发布** — 将 URL 写入 published.json
 
 **成功输出：** `✅ 发布成功！📎 标题:{title} 📎 URL:https://forum.trae.cn/t/topic/{ID} 📎 ID:#{ID} 📎 板块:{category}`
 
@@ -444,7 +446,21 @@ tags: [{标签列表}]
 
 **Cookie 检测细节：** 来源优先级 `~/.trae/cookie.md` > `/workspace/cookie.md` > 用户直接提供；必须同时包含 `sessionid` 和 `_forum_session` 字段；过期特征为访问论坛首页后页面仍显示"登录"按钮。
 
-**技术实现**：使用 Playwright MCP 或 Node.js playwright 脚本执行；Chromium 路径通过 `setup-deps.sh` 安装到 `/root/.cache/ms-playwright/chromium_headless_shell-1223/chrome-linux64/chrome`（headless）；编辑器填充使用 clipboard paste 方案（execCommand('copy') + Ctrl+V）。
+**技术实现**：使用 Playwright MCP 执行；编辑器有两种模式：
+- **Markdown 模式**（默认）：支持 Markdown、BBCode 或 HTML 语法，底部提示"使用 Markdown、BBCode 或 HTML 进行排版"
+- **富文本编辑器模式**：按 Ctrl+M 切换，提供可视化编辑工具
+
+**粘贴策略**：
+1. 将 Markdown 内容复制到剪贴板：`cat content.md | clip`
+2. 点击编辑器内容区域获取焦点
+3. 使用 Ctrl+V 粘贴
+4. 等待 2-3 秒让编辑器处理
+5. 检查右侧预览确认格式正确
+
+**常见问题**：
+- 如果预览显示原始 Markdown 而非渲染后格式，检查是否在 Markdown 模式
+- 如果粘贴超时，尝试分段粘贴或缩短内容长度
+- 标题重复会导致发布失败，需要修改标题
 
 ## 7. 输出格式规范总览
 
